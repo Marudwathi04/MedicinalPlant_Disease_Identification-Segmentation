@@ -1,7 +1,6 @@
 import torch
 from utils1.model import ResNet9
 from PIL import Image
-import io
 from torchvision import transforms
 # Load the model
 disease_classes = ['Bay Laurel_scab',
@@ -43,30 +42,38 @@ disease_classes = ['Bay Laurel_scab',
                    'Wild Nightshade___Tomato_mosaic_virus',
                    'Wild Nightshade___healthy']
 
+def load_model(model_path, num_classes):
+    """Loads the ResNet9 model."""
+    model = ResNet9(3, num_classes)
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    model.eval()
+    return model
 
-
-disease_model_path = 'plant_disease_model.pth'
-disease_model = ResNet9(3, len(disease_classes))
-disease_model.load_state_dict(torch.load(disease_model_path, map_location=torch.device('cpu')))
-disease_model.eval()
-
-
-model = torch.load(disease_model_path, map_location=torch.device('cpu'))
-
-def predict_image(img_path, model=disease_model):
+def predict_image(img_path, model):
+    """Predicts the disease for a single image."""
     transform = transforms.Compose([
         transforms.Resize(256),
         transforms.ToTensor(),
     ])
     image = Image.open(img_path)
     img_t = transform(image)
-    img_u = torch.unsqueeze(img_t, 0)
-    yb = model(img_u)
-    _, preds = torch.max(yb, dim=1)
-    prediction = disease_classes[preds[0].item()]
-    return prediction
+    img_u = torch.unsqueeze(img_t, 0) # Add batch dimension
+    with torch.no_grad():
+        yb = model(img_u)
+        _, preds = torch.max(yb, dim=1)
+        prediction = disease_classes[preds[0].item()]
+        return prediction
 
-img = "Pepper.jpg"
-prediction = predict_image(img)
+if __name__ == '__main__':
+    disease_model_path = 'plant_disease_model.pth'
+    disease_model = load_model(disease_model_path, len(disease_classes))
 
-print(prediction)
+    # Example usage:
+    # Create a dummy image or replace "path/to/your/image.jpg" with an actual image path
+    try:
+        img_path = "Pepper.jpg" # Make sure this image exists
+        prediction = predict_image(img_path, disease_model)
+        print(f"Image: {img_path}")
+        print(f"Prediction: {prediction}")
+    except FileNotFoundError:
+        print(f"Error: Make sure an image file exists at 'Pepper.jpg' to run this example.")
