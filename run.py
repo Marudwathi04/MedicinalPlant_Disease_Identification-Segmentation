@@ -1,7 +1,7 @@
 import streamlit as st
 import torch
 from PIL import Image
-import numpy as np
+import numpy as np         
 from utils1.model import ResNet9
 from torchvision import transforms
 from ultralytics import YOLO
