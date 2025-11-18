@@ -4,7 +4,7 @@
 This project focuses on **identifying and segmenting diseases in medicinal plant leaves** using advanced **deep learning** and **computer vision** techniques.  
 The goal is to assist farmers, researchers, and botanists in early detection of plant diseases for effective crop management and preservation of medicinal plant quality.
 
----       
+---         
 
 ## 🚀 Key Features
 - 🔍 **Image Classification:** Predicts disease type from a plant leaf image with high accuracy.  
